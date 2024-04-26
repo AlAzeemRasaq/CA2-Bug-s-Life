@@ -1,0 +1,3 @@
+C:/Users/alaze/CLionProjects/CA2_BugsLife/cmake-build-debug/CMakeFiles/CA2_AlAzeemAbdulRasaq_BugsLifeProject.dir
+C:/Users/alaze/CLionProjects/CA2_BugsLife/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/alaze/CLionProjects/CA2_BugsLife/cmake-build-debug/CMakeFiles/rebuild_cache.dir
