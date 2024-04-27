@@ -13,7 +13,7 @@ using namespace sf;
 using namespace std;
 
 // functions
-void boardOperation();
+void boardOperation(const std::vector<Bug*>& bugs);
 void parseLine(const string& strLine);
 void inFileStream(vector<Bug*> &bugs); void outFileStream();
 
@@ -47,20 +47,30 @@ tile *selectedTile = nullptr;
 int main() {
     vector<Bug*> bugs;
    // outFileStream();
+
+   // initialises the bugs
     inFileStream(bugs);
-    cout << bugs.size() << " bugs in file:" << endl;
+    cout << "Initialising: " << bugs.size() << " bugs in file:" << endl;
 
     std::ifstream file("bugs.txt");
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line)) {
             std::cout << line << std::endl;
+
+            HopperBug* bug = new HopperBug();
+            std::stringstream ss(line);
+            ss >> bug->type;
+            bugs.push_back(bug);
         }
         file.close();
     } else {
         std::cerr << "Unable to open file\n";
         return 1;
     }
+
+    boardOperation(bugs);
+    createTiles();
 
     int menu;
     do {
@@ -76,17 +86,26 @@ int main() {
 
         switch(menu) {
             case 1:
-                
 
                 break;
             case 2:
-                boardOperation();
+                boardOperation(bugs);
                 createTiles();
 
                 break;
             case 3:
-
-
+                int searchID;
+                std::cout << "Enter Bug ID to find: ";
+                std::cin >> searchID;
+                for (const auto& bug : bugs) {
+                    if (bug->getId() == searchID) {
+                        cout << "Bug found!" << endl;
+                        break;
+                    } else {
+                        cout << "Bug not found" << endl;
+                        break;
+                    }
+                }
                 break;
             case 4:
 
@@ -165,7 +184,7 @@ void inFileStream(vector<Bug* > &bugs) { // reads bugs from a file named 'bugs.t
         cout << "Unable to open file, or file is empty.";
 }
 
-void boardOperation() { // SFML board
+void boardOperation(const std::vector<Bug*>& bugs) { // SFML board
     sf::RenderWindow window(sf::VideoMode(500, 500), "Now displaying bug board.");
 
     vector<sf::RectangleShape> bg;
@@ -178,19 +197,53 @@ void boardOperation() { // SFML board
             bg.push_back(shape);
         }
     }
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed){
-                cout << "Goodbye." << endl;
-                window.close();
+
+    ifstream file("bugs.txt");
+    if (file.is_open()) {
+        string line;
+        vector<Bug*> bugs;
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string type;
+            int id, x, y, size;
+            pair<int, int> position;
+            Direction direction;
+
+            ss >> type >> id >> x >> y >> size;
+            position = make_pair(x, y);
+
+            Bug* bug = new Bug(type, id, position, direction, size);
+            bugs.push_back(bug);
+        }
+
+        while (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    cout << "Goodbye." << endl;
+                    window.close();
+                }
             }
+            window.clear();
+            for (RectangleShape &s: bg) {
+                window.draw(s);
+            }
+
+            for (const auto &bug: bugs) {
+                sf::CircleShape circle(25);
+                if (bug->type[0] == 'C') {
+                    circle.setFillColor(sf::Color::Red);
+                } else if (bug->type[0] == 'H') {
+                    circle.setFillColor(sf::Color::Blue);
+                } else {
+                    circle.setFillColor(sf::Color::White);
+                }
+                window.draw(circle);
+            }
+
+            window.display();
         }
-        window.clear();
-        for (RectangleShape &s: bg) {
-            window.draw(s);
-        }
-        window.display();
     }
 }
 
