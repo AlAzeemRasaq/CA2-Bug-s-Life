@@ -58,7 +58,7 @@ int main() {
         while (std::getline(file, line)) {
             std::cout << line << std::endl;
 
-            HopperBug* bug = new HopperBug();
+            Bug* bug = new Bug();
             std::stringstream ss(line);
             ss >> bug->type;
             bugs.push_back(bug);
